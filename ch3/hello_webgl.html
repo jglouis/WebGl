@@ -3,8 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="css/stylesheet.css">
-    <script src="js/commonFunctions.js">
-    </script>
 
       <script src="js/gl-matrix-min.js">
       </script>
@@ -52,7 +50,7 @@
           prg.mvMatrixUniform         = glContext.getUniformLocation(prg, 'uMVMatrix');
         }
         function initBuffers(){
-          vertices.push(-1.0, -1.0, 0.0);
+          vertices.push(-1, -1.0, 0.0);
           vertices.push( 1.0, -1.0, 0.0);
           vertices.push( 0.0,  1.0, 0.0);
           colors.push(1.0, 0.0, 0.0, 1.0);
@@ -89,9 +87,6 @@
       </script>
   </head>
   <body onload="initWebGL()">
-    <script>
-      displayTitle("Ch.03 E.g.1 : Un simple triangle", 1,1,1,1,1,1,1);
-    </script>
     <br>
     Hello World! Un simple triangle.
     <br>
