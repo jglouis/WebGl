@@ -5,6 +5,7 @@
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
 
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="webgl-utils.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
     precision mediump float;
@@ -188,6 +189,10 @@
         mat4.identity(mvMatrix);
 
         mat4.translate(mvMatrix, [-1.5, 0.0, -7.0]);
+
+        mvPushMatrix();
+        mat4.rotate(mvMatrix, degToRad(rTri), [0 , 1, 0]);
+
         gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, triangleVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
@@ -197,6 +202,10 @@
         setMatrixUniforms();
         gl.drawArrays(gl.TRIANGLES, 0, triangleVertexPositionBuffer.numItems);
 
+        mvPopMatrix();
+
+        mvPushMatrix();
+        mat4.rotate(mvMatrix, degToRad(rSquare), [1, 0, 0]);
 
         mat4.translate(mvMatrix, [3.0, 0.0, 0.0]);
         gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
@@ -207,9 +216,49 @@
 
         setMatrixUniforms();
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+
+        mvPopMatrix();
     }
 
+    function degToRad(degrees) { 
+        return degrees * Math.PI / 180; 
+    } 
 
+    var mvMatrix = mat4.create(); 
+    var mvMatrixStack = [];
+    var pMatrix = mat4.create(); 
+
+    function mvPushMatrix() {
+        var copy = mat4.create();
+        mat4.set(mvMatrix, copy);
+        mvMatrixStack.push(copy);
+    }
+
+    function mvPopMatrix() {
+        if (mvMatrixStack.length == 0) {
+            throw "Invalid popMatrix!";
+        }
+        mvMatrix = mvMatrixStack.pop();
+    }
+
+    var lastTime = 0;
+    function animate(){
+        var timeNow = new Date().getTime();
+        if (lastTime != 0) {
+            var elapsed = timeNow - lastTime;
+            rTri += (90 * elapsed) / 1000.0;
+            rSquare += (75 * elapsed) / 1000.0;
+        }
+        lastTime = timeNow;
+    }
+
+    var rTri = 0; 
+    var rSquare = 0; 
+    function tick() {
+        requestAnimFrame(tick);
+        drawScene();
+        animate();
+    }
 
     function webGLStart() {
         var canvas = document.getElementById("lesson01-canvas");
@@ -220,7 +269,7 @@
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.enable(gl.DEPTH_TEST);
 
-        drawScene();
+        tick();
     }
 
 
